@@ -2,12 +2,13 @@ import { parseJson } from '@nx/devkit';
 import {
   checkFilesExist,
   cleanupProject,
-  getSelectedPackageManager,
+  expectTestsPass,
   isNotWindows,
   newProject,
   readFile,
   readJson,
   runCLI,
+  runCLIAsync,
   uniq,
   updateFile,
   updateJson,
@@ -293,7 +294,7 @@ describe('Extra Nx Misc Tests', () => {
   });
 
   describe('Env File', () => {
-    it('should have the right env', () => {
+    it('should have the right env', async () => {
       const appName = uniq('app');
       runCLI(
         `generate @nx/react:app ${appName} --style=css --bundler=webpack --no-interactive`
@@ -334,8 +335,21 @@ describe('Extra Nx Misc Tests', () => {
     });
   `
       );
-      const unitTestsOutput = runCLI(`test ${appName}`);
-      expect(unitTestsOutput).toContain('Successfully ran target test');
+      expectTestsPass(await runCLIAsync(`test ${appName}`));
+
+      updateFile('.env', (content) => {
+        content = content.replace('firstname', 'firstname2');
+        content = content.replace('lastname', 'lastname2');
+        return content;
+      });
+      updateFile(`apps/${appName}/src/app/app.spec.tsx`, (content) => {
+        content = content.replace(
+          'Welcome firstname lastname',
+          'Welcome firstname2 lastname2'
+        );
+        return content;
+      });
+      expectTestsPass(await runCLIAsync(`test ${appName}`));
     });
   });
 
