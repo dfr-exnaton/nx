@@ -76,6 +76,8 @@ export interface PackageJson {
   executors?: string;
   'nx-migrations'?: string | NxMigrationsConfiguration;
   'ng-update'?: string | NxMigrationsConfiguration;
+  description?: string;
+  keywords?: string[];
 }
 
 export function normalizePackageGroup(
@@ -142,13 +144,25 @@ let packageManagerCommand: PackageManagerCommands | undefined;
 export function getMetadataFromPackageJson(
   packageJson: PackageJson
 ): ProjectMetadata {
-  const { scripts, nx } = packageJson ?? {};
+  const { scripts, nx, description } = packageJson ?? {};
   const includedScripts = nx?.includedScripts || Object.keys(scripts ?? {});
   return {
     targetGroups: {
       'NPM Scripts': includedScripts,
     },
+    description,
   };
+}
+
+export function getTagsFromPackageJson(packageJson: PackageJson): string[] {
+  const tags = packageJson.private ? ['npm:private'] : ['npm:public'];
+  if (packageJson.keywords?.length) {
+    tags.push(...packageJson.keywords.map((k) => `npm:${k}`));
+  }
+  if (packageJson?.nx?.tags?.length) {
+    tags.push(...packageJson?.nx.tags);
+  }
+  return tags;
 }
 
 export function readTargetsFromPackageJson(packageJson: PackageJson) {
