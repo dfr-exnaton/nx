@@ -77,6 +77,12 @@
       "version": "19.2.0-beta.2",
       "description": "Updates the default workspace data directory to .nx/workspace-data",
       "implementation": "./src/migrations/update-19-2-0/move-workspace-data-directory"
+    },
+    "19-2-1-set-project-name": {
+      "version": "19.2.1-beta.0",
+      "description": "Set project name in nx.json explicitly",
+      "implementation": "./src/migrations/update-19-2-1/set-project-name",
+      "x-repair-skip": true
     }
   }
 }
