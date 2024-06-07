@@ -72,6 +72,7 @@ export function createNodeFromPackageJson(pkgJsonPath: string, root: string) {
   const json: PackageJson = readJsonFile(join(root, pkgJsonPath));
   const project = buildProjectConfigurationFromPackageJson(
     json,
+    root,
     pkgJsonPath,
     readNxJson(root)
   );
@@ -84,6 +85,7 @@ export function createNodeFromPackageJson(pkgJsonPath: string, root: string) {
 
 export function buildProjectConfigurationFromPackageJson(
   packageJson: PackageJson,
+  root: string,
   path: string,
   nxJson: NxJsonConfiguration
 ): ProjectConfiguration & { name: string } {
@@ -91,7 +93,7 @@ export function buildProjectConfigurationFromPackageJson(
   const directory = dirname(normalizedPath);
 
   const siblingProjectJson = tryReadJson<ProjectConfiguration>(
-    join(directory, 'project.json')
+    join(root, directory, 'project.json')
   );
 
   if (siblingProjectJson) {
